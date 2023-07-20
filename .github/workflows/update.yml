@@ -1,0 +1,42 @@
+name: Create Pull Request
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  createPullRequest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout this repo
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Checkout target repo
+      uses: actions/checkout@v2
+      with:
+        repository: 'mcad7/gitops'
+        token: ${{ secrets.PAT }}
+        path: 'gitops'
+    - name: Extract branch or tag name
+      id: extract_ref
+      run: |
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+    - name: Make some change
+    # add tag name
+      run: echo "${{ env.TAG_NAME }}" > gitops/VERSION
+      
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.PAT }}
+        path: 'gitops'
+        commit-message: "Example change"
+        title: "Example change"
+        body: "This is an example change"
+        branch: "example-change-branch"
