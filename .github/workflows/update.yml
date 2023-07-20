@@ -28,15 +28,16 @@ jobs:
         echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
     - name: Make some change
-    # add tag name
       run: echo "${{ env.TAG_NAME }}" > gitops/VERSION
       
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3
+      uses: peter-evans/create-pull-request@v5.0.2
       with:
         token: ${{ secrets.PAT }}
         path: 'gitops'
         commit-message: "Example change"
         title: "Example change"
         body: "This is an example change"
-        branch: "example-change-branch"
+        branch: "update-to-${{ env.TAG_NAME }}"
+        delete-branch: true
+
